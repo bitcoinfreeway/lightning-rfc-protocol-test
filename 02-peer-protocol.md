@@ -582,7 +582,7 @@ information necessary to compose the funding transaction.
 
 1. subtype: `input_info`
 2. data:
-    * [`u64`:`satoshis`]
+    * [`u64`:`input_satoshis`]
     * [`sha256`:`prevtx_txid`]
     * [`u32`:`prevtx_vout`]
     * [`u16`:`prevtx_scriptpubkey_len`]
@@ -593,7 +593,7 @@ information necessary to compose the funding transaction.
 
 1. subtype: `output_info`
 2. data:
-    * [`u64`:`satoshis`]
+    * [`u64`:`output_satoshis`]
     * [`u16`:`scriptlen`]
     * [`scriptlen*byte`:`script`]
 
