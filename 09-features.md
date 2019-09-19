@@ -28,7 +28,7 @@ These flags may only be used in the `init` message:
 | 6/7   | `gossip_queries`                 | More sophisticated gossip control                                         | [BOLT #7][bolt07-query]      |
 | 10/11 | `gossip_queries_ex`              | Gossip queries can include additional information                         | [BOLT #7][bolt07-query]      |
 | 12/13 | `option_static_remotekey`        | Static key for remote output                                              | [BOLT #3](03-transactions.md)|
-| 13/14 | `option_dual_fund`               | Use v2 of channel open, enables dual funding                              | [BOLT #2](02-peer-protocol)  |
+| 28/29 | `option_dual_fund`               | Use v2 of channel open, enables dual funding                              | [BOLT #2](02-peer-protocol)  |
 
 ## Assigned `globalfeatures` flags
 
