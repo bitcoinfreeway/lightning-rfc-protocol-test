@@ -864,6 +864,9 @@ The receiving node:
   - MUST verify it has received valid commitment signatures
   - SHOULD apply `witness`es to the funding transaction and
     broadcast it.
+  - if has already sent or received a `funding_locked` message
+    for this channel:
+    - MUST ignore this message.
 
 #### Rationale
 
@@ -874,6 +877,10 @@ the inputs included in the funding transaction.
 which the witness data pertain to
 
 `witness` is the data for a witness element in a witness stack
+
+It is possible but a protocol error for an accepter node to
+fail to send a `funding_signed2` message while also
+successfully broadcasting the signed funding transaction.
 
 ### Kicking Off Replace-By-Fee: `init_rbf`
 
