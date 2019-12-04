@@ -314,8 +314,15 @@ class CLightningRunner(object):
                 raise test.InternalError(line,
                         "Unable to find txout for {} (tx:{})".format(funding_addr, decode))
 
-            self.rpc.fundchannel_complete(peer_id, tx['txid'], txout)
-            self.rpc.txsend(tx['txid'])
+            result = self.rpc.fundchannel_complete(peer_id, tx['txid'], txout)
+
+            # If this was a dual-funded open, the txid will have changed
+            if 'txid' in result:
+                txid = result['txid']
+            else:
+                txid = tx['txid']
+
+            self.rpc.txsend(txid)
             return True
 
         def _done(fut):
