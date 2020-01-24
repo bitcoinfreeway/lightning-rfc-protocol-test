@@ -300,7 +300,12 @@ class CLightningRunner(object):
 
             # Build a transaction
             funding_addr = result['funding_address']
-            tx = self.rpc.txprepare([{funding_addr:amount}], feerate=feerate, utxos=["{}:{}".format(txid, outnum)])
+            if 'open_channel_version' in result:
+                is_v2 = result['open_channel_version'] == 2
+            else:
+                is_v2 = False
+
+            tx = self.rpc.txprepare([{funding_addr:amount}], feerate=feerate, utxos=["{}:{}".format(txid, outnum)], zero_out_change=is_v2)
 
             # Get the vout index of the funding output
             decode = self.bitcoind.rpc.decoderawtransaction(tx['unsigned_tx'])
