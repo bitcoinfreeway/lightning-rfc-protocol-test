@@ -341,12 +341,16 @@ class Field(object):
         # If it's an array, expect a JSON array unless it's a byte array.
         if self.arraylen or self.arrayvar:
             if self.typename == 'byte':
+                # Witness fields are bytes, but some of them have SIG()
+                if value.startswith('SIG('):
+                    if not value.endswith(')'):
+                        raise LineError(line, "SIG() improperly formatted. {}".format(value))
+
+                    privkey, hash_digest = value[4:-1].split(':')
+                    return (privkey, hash_digest), None
                 try:
                     v = bytes.fromhex(value)
                 except ValueError:
-                    if value.startswith('*'):
-                        v = value
-                        return v, v
                     raise LineError(line,
                                     "Non-hex value for {} byte array: '{}'"
                                     .format(self.name, value))
@@ -879,9 +883,9 @@ def compare_results(msgname, f, v, exp):
                 .format(f.name))
 
     # Do signature verification, if necessary
-    if (f.typename == 'signature' and isinstance(exp,tuple)) or (f.typename == 'signature'
-            and (f.arrayvar or f.arraylen) and isinstance(exp,list)):
-            if f.arrayvar or f.arraylen:
+    if ((f.typename in ['signature'] or f.name in ['witness']) and (isinstance(exp,tuple)
+            or ((f.arrayvar or f.arraylen) and isinstance(exp,list)))):
+            if (f.arrayvar or f.arraylen) and f.typename not in ['byte']:
                 for (e, val) in list(map(lambda x,y: (x,y), exp, v)):
                     if isinstance(e, tuple):
                         if not Sigs.verify_sig(e[0], e[1], val):
@@ -890,9 +894,10 @@ def compare_results(msgname, f, v, exp):
                     elif e != val:
                         return ("Expected {}.{}(type:{}) {} but got {}"
                                 .format(msgname,
-                                        f.name, f.typename, e.hex(), val.hex()))
+                                        f.name, f.typename, e, val))
             else:
-                # v should be a valid signature, a byte-array r||s
+                # v should be a valid signature, a byte-array r||s or a DER encoded value
+                print("testing sigs for {} {} {}".format(exp[0], exp[1], v.hex()))
                 if not Sigs.verify_sig(exp[0], exp[1], v):
                     return "Invalid signature ({}) for privkey {}, hash {}".format(v.hex(), exp[0], exp[1])
             # Successfully matched all sigs!!
@@ -923,27 +928,9 @@ def compare_results(msgname, f, v, exp):
 
     # Simple comparison
     elif v != exp:
-        if f.isinteger:
-            # Instead of checking a field's value, allow a test
-            # to specify a range of bytelen that's valid.
-            # This is needed for witness data verifications.
-            # e.g. *71-73 or *73 for exactly 73 bytes
-            if isinstance(exp, str) and exp.startswith('*') and check_range(exp[1:], v):
-                return None
-            valstr = str(v)
-            expectstr = str(exp)
-        # Same as above note about a range of length
-        elif isinstance(exp,str) and exp.startswith('*'):
-            if check_range(exp[1:], len(v.hex()) // 2):
-                return None
-            expectstr = "result of bytelen {}".format(exp[1:])
-            valstr = str(len(v.hex()) // 2)
-        else:
-            valstr = v.hex()
-            expectstr = exp.hex()
         return ("Expected {}.{} {} but got {}"
                 .format(msgname,
-                        f.name, expectstr, valstr))
+                        f.name, exp.hex(), v.hex()))
     return None
 
 
