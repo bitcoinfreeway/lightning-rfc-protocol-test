@@ -16,17 +16,27 @@ def verify_sig(secret, hash_digest, sig_bytes):
         inputs:
         - privkey: a hex-string private key scalar
         - hash_digest: a hex-string hash message
-        - sig: a 64-byte array of concatenated r + s values of the signature to verify
+        - sig: a 64-byte array of concatenated r + s values of the signature to verify, OR
+               a DER-encoded signature
 
         returns:
         - True if valid signature,
         - False otherwise
     """
+    is_der = False
     if len(sig_bytes) != 64:
-        raise ValueError("Expected a 64-byte array for sig, got {} ({})".format(len(sig_bytes), sig_bytes.hex()))
+        if len(sig_bytes) >= 71 and len(sig_bytes) <= 73:
+            # In DER format, parse to sig-bytes
+            is_der = True
+        else:
+            raise ValueError("Expected a 64-byte array for sig, got {} ({})".format(len(sig_bytes), sig_bytes.hex()))
 
     privkey = PrivateKey(bytes(bytearray.fromhex(secret)), raw=True)
-    sig = privkey.ecdsa_deserialize_compact(sig_bytes)
+    if is_der:
+        # minus the last byte because it's the sighash
+        sig = privkey.ecdsa_deserialize(sig_bytes[:-1])
+    else:
+        sig = privkey.ecdsa_deserialize_compact(sig_bytes)
     return privkey.pubkey.ecdsa_verify(bytes(bytearray.fromhex(hash_digest)), sig, raw=True)
 
 
