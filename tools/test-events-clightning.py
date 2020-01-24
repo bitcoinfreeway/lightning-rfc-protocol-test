@@ -7,7 +7,6 @@
 import bitcoin
 import bitcoin.rpc
 import importlib
-import lightning
 import os
 import shutil
 import struct
@@ -17,6 +16,7 @@ import time
 
 from concurrent import futures
 from ephemeral_port_reserve import reserve
+from pyln.client import LightningRpc
 
 test = importlib.import_module('test-events')
 
@@ -154,7 +154,7 @@ class CLightningRunner(object):
                                       '--log-level=debug',
                                       '--log-file=log']
                                       + self.startup_flags)
-        self.rpc = lightning.LightningRpc(os.path.join(self.lightning_dir, "regtest", "lightning-rpc"))
+        self.rpc = LightningRpc(os.path.join(self.lightning_dir, "regtest", "lightning-rpc"))
 
         def node_ready(rpc):
             try:
