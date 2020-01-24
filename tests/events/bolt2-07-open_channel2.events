@@ -1,0 +1,185 @@
+# Variations on dual-funding open_channel2.
+# Command line options: -f no-fuzz=true -f policy=exact -f fundsats=0
+
+1. block: height=102 tx=020000000001017b8705087f9bddd2777021d2a1dfefc2f1c5afa833b5c4ab00ccc8a556d042830000000000ffffffff0640420f000000000016001483440596268132e6c99d44dae2d151dabd9a2b2320a1070000000000160014ca5cc81df579bd589a428c0d29dceb81513fce8d60e3160000000000160014d1f40e954d7a792284b6fb19a2e0bf777441d83ea025260000000000160014c6e21030d1ed3a7afb19a3c425fab7b258e30764e0673500000000001600141664d29b4048d224341e0a20bf3d680b3293aaea788b7c29010000001600143ae8c2926dae014d88ff69169ef9a6928c18c09b024730440220308b88e0ebb318b6c75454485edcf39bfaa4c7a9acc9a050037e9107842f156402206c2217dea53a2a3e950b9e441e052c820b99cb5a470b4f513d16f6eb61671ef401210279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f8179800000000
+
+2. connect: privkey=0000000000000000000000000000000000000000000000000000000000000002
+3. expect-send: type=init localfeatures=2000/3000 option_dual_fund/odd
+3. expect-send: type=init localfeatures=1000/3000 option_dual_fund/even
+    # Compulsory is OK
+    1. recv: type=init globalfeatures= localfeatures=10aa
+    # Optional is OK
+    1. recv: type=init globalfeatures= localfeatures=20aa
+
+4. maybe-send: type=gossip_timestamp_filter
+   chain_hash=06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f
+
+    # Fee is taken out of funding amount
+    1. recv: type=open_channel2
+      chain_hash=06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f
+      temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+      funding_satoshis=500000
+      push_msat=0
+      dust_limit_satoshis=546
+      max_htlc_value_in_flight_msat=4294967295
+      htlc_minimum_msat=0
+      feerate_per_kw=1000
+      feerate_per_kw_funding=1000
+      to_self_delay=6
+      max_accepted_htlcs=483
+      # funding_privkey=0000000000000000000000000000000000000000000000000000000000000020
+      funding_pubkey=03d30199d74fb5a22d47b6e054e2f378cedacffcb89904a61d75d0dbd407143e65
+      # revocation_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000021
+      revocation_basepoint=021697ffa6fd9de627c077e3d2fe541084ce13300b0bec1146f95ae57f0d0bd6a5
+      # payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000022
+      payment_basepoint=031be68a5a028f2601d0e80d468c344ba331d611b96c358b6032e8b4da0547fc11
+      # delayed_payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000023
+      delayed_payment_basepoint=03605bdb019981718b986d0f07e834cb0d9deb8360ffb7f61df982345ef27a7479
+      # htlc_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000024
+      htlc_basepoint=02e0392cfa338aaf2f0b56c563e3e5e67a5d5fefe3388f85d90c899da20f0198f9
+      # shachain seed=0000000000000000000000000000000000000000000000000000000000000000
+      # first per_commitment_secret=02a40c85b6f28da08dfdbe0926c53fab2de6d28c10301f8f7c4073d5e42e3148
+      first_per_commitment_point=02037803a3228ec3a517835480ffac64c0557d9d75e0fe85861ab0be9eb224e6f8
+      channel_flags=01
+      opening_tlv=
+
+    # Extra (post fee) is added to funding amount
+    1. recv: type=open_channel2
+      chain_hash=06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f
+      temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+      funding_satoshis=400000
+      push_msat=0
+      dust_limit_satoshis=546
+      max_htlc_value_in_flight_msat=4294967295
+      htlc_minimum_msat=0
+      feerate_per_kw=1000
+      feerate_per_kw_funding=1000
+      to_self_delay=6
+      max_accepted_htlcs=483
+      # funding_privkey=0000000000000000000000000000000000000000000000000000000000000020
+      funding_pubkey=03d30199d74fb5a22d47b6e054e2f378cedacffcb89904a61d75d0dbd407143e65
+      # revocation_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000021
+      revocation_basepoint=021697ffa6fd9de627c077e3d2fe541084ce13300b0bec1146f95ae57f0d0bd6a5
+      # payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000022
+      payment_basepoint=031be68a5a028f2601d0e80d468c344ba331d611b96c358b6032e8b4da0547fc11
+      # delayed_payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000023
+      delayed_payment_basepoint=03605bdb019981718b986d0f07e834cb0d9deb8360ffb7f61df982345ef27a7479
+      # htlc_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000024
+      htlc_basepoint=02e0392cfa338aaf2f0b56c563e3e5e67a5d5fefe3388f85d90c899da20f0198f9
+      # shachain seed=0000000000000000000000000000000000000000000000000000000000000000
+      # first per_commitment_secret=02a40c85b6f28da08dfdbe0926c53fab2de6d28c10301f8f7c4073d5e42e3148
+      first_per_commitment_point=02037803a3228ec3a517835480ffac64c0557d9d75e0fe85861ab0be9eb224e6f8
+      channel_flags=01
+      opening_tlv=
+
+    # Exact amount (funding leaves out fee exactly)
+    1. recv: type=open_channel2
+      chain_hash=06226e46111a0b59caaf126043eb5bbf28c34f3a5e332a1fc7b2b73cf188910f
+      temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+      funding_satoshis=499513
+      push_msat=0
+      dust_limit_satoshis=546
+      max_htlc_value_in_flight_msat=4294967295
+      htlc_minimum_msat=0
+      feerate_per_kw=1000
+      feerate_per_kw_funding=1000
+      to_self_delay=6
+      max_accepted_htlcs=483
+      # funding_privkey=0000000000000000000000000000000000000000000000000000000000000020
+      funding_pubkey=03d30199d74fb5a22d47b6e054e2f378cedacffcb89904a61d75d0dbd407143e65
+      # revocation_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000021
+      revocation_basepoint=021697ffa6fd9de627c077e3d2fe541084ce13300b0bec1146f95ae57f0d0bd6a5
+      # payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000022
+      payment_basepoint=031be68a5a028f2601d0e80d468c344ba331d611b96c358b6032e8b4da0547fc11
+      # delayed_payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000023
+      delayed_payment_basepoint=03605bdb019981718b986d0f07e834cb0d9deb8360ffb7f61df982345ef27a7479
+      # htlc_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000024
+      htlc_basepoint=02e0392cfa338aaf2f0b56c563e3e5e67a5d5fefe3388f85d90c899da20f0198f9
+      # shachain seed=0000000000000000000000000000000000000000000000000000000000000000
+      # first per_commitment_secret=02a40c85b6f28da08dfdbe0926c53fab2de6d28c10301f8f7c4073d5e42e3148
+      first_per_commitment_point=02037803a3228ec3a517835480ffac64c0557d9d75e0fe85861ab0be9eb224e6f8
+      channel_flags=01
+      opening_tlv=
+
+5. expect-send: type=accept_channel2
+   temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+   funding_satoshis=0
+   dust_limit_satoshis=546
+   max_htlc_value_in_flight_msat=18446744073709551615
+   htlc_minimum_msat=0
+   minimum_depth=3
+   to_self_delay=6
+   max_accepted_htlcs=483
+   # funding_privkey=0000000000000000000000000000000000000000000000000000000000000010
+   funding_pubkey=03e60fce93b59e9ec53011aabc21c23e97b2a31369b87a5ae9c44ee89e2a6dec0a
+   # revocation_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000011
+   revocation_basepoint=03defdea4cdb677750a420fee807eacf21eb9898ae79b9768766e4faa04a2d4a34
+   # payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000012
+   payment_basepoint=025601570cb47f238d2b0286db4a990fa0f3ba28d1a319f5e7cf55c2a2444da7cc
+   # delayed_payment_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000013
+   delayed_payment_basepoint=022b4ea0a797a443d293ef5cff444f4979f06acfebd7e86d277475656138385b6c
+   # htlc_basepoint_secret=0000000000000000000000000000000000000000000000000000000000000014
+   htlc_basepoint=024ce119c96e2fa357200b559b2f7dd5a5f02d5290aff74b03f3e471b273211c97
+   # shachain seed=ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+   # first per_commitment_secret=7cc854b54e3e0dcdb010d7a3fee464a9687be6e8db3be6854c475621e007a5dc
+   first_per_commitment_point=0288a618cb6027c3218a37cbe9e882379f17d87d03f6e99d0b60292478d2aded06
+   accept_tlv=
+
+    1. expect-send: type=funding_add_complete
+      temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+      num_inputs=0
+      num_outputs=0
+
+    2. recv: type=funding_add_input
+       temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+       # prevtx_txid=16835ac8c154b616baac524163f41fb0c4f82c7b972ad35d4d6f18d854f6856b
+       input_info=[{sats=500000,prevtx_txid=3f05da71fb470a53807eb01db4a9220941e3737fa44bccd1fb00f1968c98396c,prevtx_vout=1,prevtx_scriptpubkey=0014ca5cc81df579bd589a428c0d29dceb81513fce8d,max_witness_len=109,script=}]
+
+    3. recv: type=funding_add_complete
+      temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+      num_inputs=1
+      num_outputs=0
+
+    4. recv: type=commitment_signed
+      channel_id=303360524ffb4c7a5c3518c91adbf39324ea0e6126294dd5d52496e634580b37
+      signature=SIG(0000000000000000000000000000000000000000000000000000000000000020:4529699e6485d9ecfec915eaee64b1d37b71b763c775c0700ac0aefb53dbb98a)
+      htlc_signature=
+
+    5. expect-send: type=commitment_signed
+      channel_id=303360524ffb4c7a5c3518c91adbf39324ea0e6126294dd5d52496e634580b37
+      signature=SIG(0000000000000000000000000000000000000000000000000000000000000010:42466ed8bdeec32be708a27c6f130b596060bde84d0cb608facddaa65de37b47)
+      htlc_signature=
+
+    6. expect-send: type=funding_signed2
+      channel_id=303360524ffb4c7a5c3518c91adbf39324ea0e6126294dd5d52496e634580b37
+      witness_stack=
+
+   # In theory, the accepter should broadcast this transaction for us.
+    7. block: height=103 n=3 tx=020000000001013f05da71fb470a53807eb01db4a9220941e3737fa44bccd1fb00f1968c98396c0100000000ffffffff01399f070000000000220020c46bf3d1686d6dbb2d9244f8f67b90370c5aa2747045f1aeccb77d81871173820247304402206e0fb45a7abd2cb5c90519d290b444dbdbb4ac319350c3e89cc70bae207c1fe8022020d91b24d102eb883b5acdae8d83b115d7b4b2febed789fd2e94bc567d5e38f501210308d79e1c98df471f4061d9b289a1b6423f727a5b47aabd2b539db4343a51a0e500000000
+
+    8. expect-send: type=funding_locked
+      channel_id=303360524ffb4c7a5c3518c91adbf39324ea0e6126294dd5d52496e634580b37
+      next_per_commitment_point=032405cbd0f41225d5f203fe4adac8401321a9e05767c5f8af97d51d2e81fbb206
+
+    9. recv: type=funding_locked
+      channel_id=303360524ffb4c7a5c3518c91adbf39324ea0e6126294dd5d52496e634580b37
+      next_per_commitment_point=027eed8389cf8eb715d73111b73d94d2c2d04bf96dc43dfd5b0970d80b3617009d
+
+    # Fails, funding + output above inputs
+    1. recv: type=funding_add_input
+       temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+       # prevtx_txid=16835ac8c154b616baac524163f41fb0c4f82c7b972ad35d4d6f18d854f6856b
+       input_info=[{sats=500000,prevtx_txid=3f05da71fb470a53807eb01db4a9220941e3737fa44bccd1fb00f1968c98396c,prevtx_vout=1,prevtx_scriptpubkey=0014ca5cc81df579bd589a428c0d29dceb81513fce8d,max_witness_len=109,script=}]
+
+    2. recv: type=funding_add_output
+       temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+       # prevtx_txid=16835ac8c154b616baac524163f41fb0c4f82c7b972ad35d4d6f18d854f6856b
+       output_info=[{sats=499800,script=00140f0963bc774334ebc14d11ce940c35cfa6986415}]
+
+    3. recv: type=funding_add_complete
+       temporary_channel_id=0000000000000000000000000000000000000000000000000000000000000000
+       # prevtx_txid=16835ac8c154b616baac524163f41fb0c4f82c7b972ad35d4d6f18d854f6856b
+       num_outputs=0
+       num_inputs=0
+       
+    4. expect-error:
